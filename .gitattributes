@@ -1,0 +1,8 @@
+# Normalize line endings. CI runs on Linux and the Robot suites are
+# whitespace-sensitive, so text files are stored and checked out with LF
+# regardless of the contributor's platform.
+* text=auto eol=lf
+
+# Generated Robot Framework reports are HTML/XML but are not reviewed as text.
+reports/**/*.html -diff
+reports/**/*.xml  -diff
