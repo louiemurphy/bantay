@@ -1,0 +1,100 @@
+# Gym fixture registry.
+#
+# Strategies are ordered from most to least trustworthy: a semantic test hook
+# first, then a name/type pair, then a styling-dependent selector last. The order
+# is itself an assertion about which selectors deserve trust.
+#
+# The fingerprint is what makes recovery possible once every strategy above it has
+# gone stale. It describes the element as it appears on the unmutated fixture.
+locators:
+  email:
+    description: "Email address field on the checkout form"
+    strategies: ["css:[data-test='email']", "css:input[name='email'][type='email']", "id:email-input"]
+    fingerprint:
+      tag: input
+      accessible_name: "email address"
+      attrs: {id: email-input, type: email, name: email, placeholder: "you@example.com", data-test: email}
+      classes: [input, input-text]
+      ancestor_path: [html, body, form, div]
+      sibling_index: 1
+
+  postcode:
+    description: "Postcode field on the checkout form"
+    strategies: ["css:[data-test='postcode']", "css:input[name='postcode']", "id:postcode-input"]
+    fingerprint:
+      tag: input
+      accessible_name: "postcode"
+      attrs: {id: postcode-input, type: text, name: postcode, placeholder: "4000", data-test: postcode}
+      classes: [input, input-text]
+      ancestor_path: [html, body, form, div]
+      sibling_index: 1
+
+  shipping:
+    description: "Shipping method dropdown"
+    strategies: ["css:[data-test='shipping']", "css:select[name='shipping']", "id:shipping-select"]
+    fingerprint:
+      tag: select
+      accessible_name: "shipping method"
+      attrs: {id: shipping-select, name: shipping, data-test: shipping}
+      classes: [input, input-select]
+      ancestor_path: [html, body, form, div]
+      sibling_index: 1
+
+  promo:
+    description: "Promo code field"
+    strategies: ["css:[data-test='promo']", "css:input[name='promo']", "id:promo-input"]
+    fingerprint:
+      tag: input
+      accessible_name: "promo code"
+      attrs: {id: promo-input, type: text, name: promo, placeholder: "SAVE10", data-test: promo}
+      classes: [input, input-text]
+      ancestor_path: [html, body, form, div]
+      sibling_index: 1
+
+  total:
+    description: "Order total amount"
+    strategies: ["css:[data-test='total']", "id:order-total"]
+    fingerprint:
+      tag: span
+      text: "225.00"
+      accessible_name: "225.00"
+      attrs: {id: order-total, data-test: total}
+      classes: [total]
+      ancestor_path: [html, body, form, p]
+      sibling_index: 0
+
+  apply_promo:
+    description: "Button that applies the promo code to the order total"
+    strategies: ["css:[data-test='apply-promo']", "css:button[type='button']", "id:apply-promo"]
+    fingerprint:
+      tag: button
+      text: "apply promo code"
+      accessible_name: "apply promo code"
+      attrs: {id: apply-promo, type: button, data-test: apply-promo}
+      classes: [btn, btn-secondary]
+      ancestor_path: [html, body, form, div]
+      sibling_index: 0
+
+  place_order:
+    description: "Primary submit button that places the order"
+    strategies: ["css:[data-test='place-order']", "css:button[type='submit']", "id:place-order"]
+    fingerprint:
+      tag: button
+      text: "place order"
+      accessible_name: "place order"
+      attrs: {id: place-order, type: submit, data-test: place-order}
+      classes: [btn, btn-primary]
+      ancestor_path: [html, body, form, div]
+      sibling_index: 1
+
+  confirmation:
+    description: "Order confirmation status message, hidden until submit"
+    strategies: ["css:#confirmation", "css:p[role='status']"]
+    fingerprint:
+      tag: p
+      text: "order placed. thank you."
+      accessible_name: "order placed. thank you."
+      attrs: {id: confirmation, role: status}
+      classes: [confirmation]
+      ancestor_path: [html, body]
+      sibling_index: 2

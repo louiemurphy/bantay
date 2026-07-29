@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Generated. reports/patches/ is deliberately NOT ignored when a run proposes
+# one - a patch proposal is meant to arrive in a pull request and be argued about.
+reports/dryrun/
+reports/robot/
+reports/gym/
+reports/tuning/
+reports/screenshots/
+reports/telemetry.json
+geckodriver.log

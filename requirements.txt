@@ -1,0 +1,8 @@
+robotframework>=7.0
+robotframework-seleniumlibrary>=6.3
+selenium>=4.20
+PyYAML>=6.0
+pytest>=8.0
+# Optional: only needed for BANTAY_AI=live or =record. Everything in this repo
+# runs green without it, replaying committed cassettes instead.
+# anthropic>=0.40

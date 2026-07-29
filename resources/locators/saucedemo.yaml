@@ -1,0 +1,64 @@
+# Public-site registry: https://www.saucedemo.com
+#
+# Chosen because it is published explicitly for automation practice, so exercising
+# it does not breach anyone's terms of service. This suite covers realism; the
+# mutation gym covers measurement.
+locators:
+  username:
+    description: "Login username field"
+    strategies: ["css:[data-test='username']", "id:user-name", "css:input[name='user-name']"]
+    fingerprint:
+      tag: input
+      accessible_name: "username"
+      attrs: {id: user-name, name: user-name, type: text, placeholder: "Username", data-test: username}
+      ancestor_path: [html, body, div, div, div, div, form, div]
+      sibling_index: 0
+
+  password:
+    description: "Login password field"
+    strategies: ["css:[data-test='password']", "id:password", "css:input[type='password']"]
+    fingerprint:
+      tag: input
+      accessible_name: "password"
+      attrs: {id: password, name: password, type: password, placeholder: "Password", data-test: password}
+      ancestor_path: [html, body, div, div, div, div, form, div]
+      sibling_index: 0
+
+  login_button:
+    description: "Submit button on the login form"
+    strategies: ["css:[data-test='login-button']", "id:login-button", "css:input[type='submit']"]
+    fingerprint:
+      tag: input
+      accessible_name: "login"
+      attrs: {id: login-button, name: login-button, type: submit, value: Login, data-test: login-button}
+      ancestor_path: [html, body, div, div, div, div, form]
+      sibling_index: 2
+
+  login_error:
+    description: "Error banner shown after a rejected login"
+    strategies: ["css:[data-test='error']", "css:h3[data-test='error']"]
+    fingerprint:
+      tag: h3
+      attrs: {data-test: error}
+      ancestor_path: [html, body, div, div, div, div, form, div]
+      sibling_index: 0
+
+  sort_dropdown:
+    description: "Product sort order dropdown on the inventory page"
+    strategies: ["css:[data-test='product-sort-container']", "css:select.product_sort_container"]
+    fingerprint:
+      tag: select
+      attrs: {data-test: product-sort-container}
+      classes: [product_sort_container]
+      ancestor_path: [html, body, div, div, div, div, div, span]
+      sibling_index: 0
+
+  cart_link:
+    description: "Shopping cart icon in the header"
+    strategies: ["css:[data-test='shopping-cart-link']", "css:a.shopping_cart_link"]
+    fingerprint:
+      tag: a
+      classes: [shopping_cart_link]
+      attrs: {data-test: shopping-cart-link}
+      ancestor_path: [html, body, div, div, div, div]
+      sibling_index: 2

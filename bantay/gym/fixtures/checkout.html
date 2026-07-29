@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bantay Gym &mdash; Checkout Fixture</title>
+  <style>
+    /* Animations and web fonts are deliberately absent. A fixture that renders
+       identically on every machine is a fixture whose failures mean something. */
+    body { font-family: monospace; margin: 2rem; max-width: 40rem; }
+    .field { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: .25rem; }
+    .cart-list { padding-left: 1.25rem; }
+    .actions { display: flex; gap: .5rem; margin-top: 1.5rem; }
+    [disabled] { opacity: .4; }
+  </style>
+</head>
+<body>
+  <!--
+    Each element the suite targets carries data-bantay-truth="<key>". Mutation
+    operators must preserve it and the resolver must never read it: it exists so
+    the gym can distinguish a correct recovery from a confident wrong one.
+  -->
+  <header class="page-header">
+    <h1 id="page-title" class="title">Checkout</h1>
+  </header>
+
+  <form id="checkout-form" class="checkout-form" novalidate>
+    <div class="field">
+      <label for="email-input">Email address</label>
+      <input id="email-input" class="input input-text" type="email" name="email"
+             placeholder="you@example.com" data-test="email"
+             data-bantay-truth="email">
+    </div>
+
+    <div class="field">
+      <label for="postcode-input">Postcode</label>
+      <input id="postcode-input" class="input input-text" type="text" name="postcode"
+             placeholder="4000" data-test="postcode"
+             data-bantay-truth="postcode">
+    </div>
+
+    <div class="field">
+      <label for="shipping-select">Shipping method</label>
+      <select id="shipping-select" class="input input-select" name="shipping"
+              data-test="shipping" data-bantay-truth="shipping">
+        <option value="standard">Standard</option>
+        <option value="express">Express</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="promo-input">Promo code</label>
+      <input id="promo-input" class="input input-text" type="text" name="promo"
+             placeholder="SAVE10" data-test="promo"
+             data-bantay-truth="promo">
+    </div>
+
+    <h2 class="cart-heading">Your cart</h2>
+    <ul class="cart-list" id="cart">
+      <li class="cart-item" data-sku="a1"><span class="item-name">Sardines</span> &mdash; 120.00</li>
+      <li class="cart-item" data-sku="b2"><span class="item-name">Calamansi</span> &mdash; 45.00</li>
+      <li class="cart-item" data-sku="c3"><span class="item-name">Pandesal</span> &mdash; 60.00</li>
+    </ul>
+
+    <p class="total-line">Total: <span id="order-total" class="total"
+       data-test="total" data-bantay-truth="total">225.00</span></p>
+
+    <div class="actions">
+      <button id="apply-promo" class="btn btn-secondary" type="button"
+              data-test="apply-promo" data-bantay-truth="apply_promo">Apply promo code</button>
+      <button id="place-order" class="btn btn-primary" type="submit"
+              data-test="place-order" data-bantay-truth="place_order">Place order</button>
+    </div>
+  </form>
+
+  <p id="confirmation" class="confirmation" role="status" hidden
+     data-bantay-truth="confirmation">Order placed. Thank you.</p>
+
+  <script>
+    // Minimal behaviour so the suite has something real to assert on.
+    //
+    // Hooks are data-bantay-truth, the one attribute every mutation operator must
+    // preserve. Binding by id instead meant strip_ids and scramble_ids broke the
+    // page's own behaviour rather than its locators: the lookups returned null,
+    // this script threw, no submit handler was attached, and journey tests then
+    // failed for reasons unrelated to locator resolution.
+    var truth = function (name) {
+      return document.querySelector('[data-bantay-truth="' + name + '"]');
+    };
+    var form = document.forms[0];
+
+    var placeOrder = function (event) {
+      event.preventDefault();
+      truth('confirmation').hidden = false;
+    };
+
+    form.addEventListener('submit', placeOrder);
+    form.addEventListener('click', function (event) {
+      // button_to_anchor rewrites the submit button as <a role="button">, which
+      // does not submit a form, so the click is handled directly.
+      if (event.target.closest('[data-bantay-truth="place_order"]')) {
+        return placeOrder(event);
+      }
+      if (!event.target.closest('[data-bantay-truth="apply_promo"]')) return;
+      var total = truth('total');
+      if (total.dataset.discounted) return;
+      total.textContent = (parseFloat(total.textContent) * 0.9).toFixed(2);
+      total.dataset.discounted = 'true';
+    });
+  </script>
+</body>
+</html>

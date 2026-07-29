@@ -1,0 +1,85 @@
+name: ci
+
+# Two jobs. `offline` is the gate: it needs no browser, no network and no API key,
+# so it is fast and stable. `browser` is allowed to be slower and holds everything
+# that requires Chrome.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  offline:
+    name: unit tests + tuning sweep + keyword validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: python -m pytest tests/unit -q
+
+      - name: Validate every Robot keyword resolves
+        run: python -m robot --dryrun --outputdir reports/dryrun tests/
+
+      - name: Regenerate the tuning sweep
+        run: python -m bantay.gym.offline --seeds 40
+
+      # The sweep is a quality gate, not just a report. Any false heal fails CI:
+      # a wrong heal is a green test that no longer tests the product.
+      - name: Fail on any false heal
+        run: |
+          python - <<'PY'
+          import json, sys
+          rows = json.load(open("reports/tuning/sweep.json"))
+          bad = [r for r in rows
+                 if r["threshold"] == 0.45 and r["margin"] == 0.10
+                 and r["false_heals"] > 0]
+          if bad:
+              print("FALSE HEALS at committed settings:", bad)
+              sys.exit(1)
+          print("no false heals at committed settings")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: offline-reports
+          path: reports/
+
+  browser:
+    name: resilience gym (Chrome)
+    runs-on: ubuntu-latest
+    # Non-blocking. A browser job that gates merges will eventually flake, which
+    # trains reviewers to ignore a red build. The offline job is the gate.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Resilience measurement
+        env:
+          BANTAY_AI: replay
+        run: python -m bantay.gym.run --seeds 20
+
+      - name: Robot resilience suite
+        run: |
+          python -m robot --listener bantay.listener.BantayListener \
+            --outputdir reports/robot tests/gym/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-reports
+          path: reports/
